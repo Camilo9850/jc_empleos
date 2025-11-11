@@ -21,7 +21,8 @@ class Menu extends Model
     public function cargarDesdeRequest($request) {
         $this->idmenu = $request->input('id') != "0" ? $request->input('id') : $this->idmenu;
         $this->nombre = $request->input('txtNombre');
-        $this->id_padre = $request->input('lstMenuPadre');
+        // Convertir cadena vacía a NULL para id_padre (columna INTEGER)
+        $this->id_padre = $request->input('lstMenuPadre') != "" ? $request->input('lstMenuPadre') : null;
         $this->orden = $request->input('txtOrden') != "" ? $request->input('txtOrden') : 0;
         $this->activo = $request->input('lstActivo');
         $this->url = $request->input('txtUrl');
@@ -124,15 +125,26 @@ class Menu extends Model
     }
 
     public function guardar() {
+        // Convertir NULL a NULL en SQL, cadena vacía a NULL, si no mantener el valor
+        $id_padre = ($this->id_padre === null || $this->id_padre === '') ? null : $this->id_padre;
+        
         $sql = "UPDATE sistema_menues SET
-            nombre='$this->nombre',
-            id_padre='$this->id_padre',
-            orden=$this->orden,
-            activo='$this->activo',
-            url='$this->url',
-            css='$this->css'
+            nombre=?,
+            id_padre=?,
+            orden=?,
+            activo=?,
+            url=?,
+            css=?
             WHERE idmenu=?";
-        $affected = DB::update($sql, [$this->idmenu]);
+        $affected = DB::update($sql, [
+            $this->nombre,
+            $id_padre,
+            $this->orden,
+            $this->activo,
+            $this->url,
+            $this->css,
+            $this->idmenu
+        ]);
     }
 
     public function eliminar()
@@ -144,6 +156,9 @@ class Menu extends Model
 
     public function insertar()
     {
+        // Convertir NULL o cadena vacía a NULL para id_padre
+        $id_padre = ($this->id_padre === null || $this->id_padre === '') ? null : $this->id_padre;
+        
         $sql = "INSERT INTO sistema_menues (
                 nombre,
                 id_padre,
@@ -154,11 +169,11 @@ class Menu extends Model
             ) VALUES (?, ?, ?, ?, ?, ?);";
         $result = DB::insert($sql, [
             $this->nombre,
-            $this->id_padre,
+            $id_padre,
             $this->orden,
             $this->activo,
             $this->url,
-            $this->css,
+            $this->css
         ]);
         return $this->idmenu = DB::getPdo()->lastInsertId();
     }

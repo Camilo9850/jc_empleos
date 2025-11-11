@@ -6,17 +6,108 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('titulo') - {{ env('APP_NAME') }}</title>
-  <link rel="icon" href="{{ asset('images/favicon.png') }}">
+  <link rel="icon" href="{{ asset('img/jc.png') }}">
   <link href="{{ asset('css/normalize.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ asset('css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ asset('css/fontawesome/css/all.min.css') }}" rel="stylesheet" type="text/css">
+  <!-- FontAwesome 6.6.0 - Última versión -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="{{ asset('css/dataTables.bootstrap4.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ asset('css/sb-admin.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ asset('css/estilos.css') }}" rel="stylesheet" type="text/css">
-  <link href="{{ asset('css/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet" type="text/css">
-  <script src="{{ asset('js/jquery.min.js') }}"></script>
+  <!-- DataTables CDN CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  
+  <!-- Estilos personalizados para tema rojo -->
+  <style>
+    .navbar-dark.bg-dark {
+      background-color: #dc3545 !important; /* Rojo Bootstrap */
+    }
+    
+    .btn-primary {
+      background-color: #dc3545;
+      border-color: #dc3545;
+    }
+    
+    .btn-primary:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+    }
+    
+    .sidebar .nav-link {
+      color: white !important;
+      background-color: transparent;
+    }
+    
+    .sidebar {
+      background-color: #dc3545 !important;
+    }
+    
+    .sidebar .navbar-nav {
+      background-color: #dc3545 !important;
+    }
+    
+    .sidebar .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+    }
+    
+    .sidebar .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+    }
+    
+    .sidebar .dropdown-menu {
+      background-color: #c82333;
+      border: none;
+    }
+    
+    .sidebar .dropdown-item {
+      color: white !important;
+      padding-left: 30px;
+    }
+    
+    .sidebar .dropdown-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white !important;
+    }
+    
+    .page-header {
+      color: #dc3545;
+      border-bottom: 2px solid #dc3545;
+      padding-bottom: 10px;
+    }
+    
+    .modal-header {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .modal-header .close {
+      color: white;
+    }
+    
+    .sticky-footer {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .scroll-to-top {
+      background-color: #dc3545;
+    }
+    
+    .scroll-to-top:hover {
+      background-color: #c82333;
+    }
+  </style>
+  
+  <!-- jQuery CDN recomendado para DataTables -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- DataTables CDN JS -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
   <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ asset('js/jquery.easing.min.js') }}"></script>
   <script src="{{ asset('js/Chart.min.js') }}"></script>
@@ -33,12 +124,12 @@
 	        idGrupo = $("#lstGrupo option:selected").val();
 	        $.ajax({
 	            type: "GET",
-	            url: "{{ asset('grupo/setearGrupo') }}",
+	            url: "/admin/grupo/setearGrupo",
 	            data: { id:idGrupo },
 	            async: true,
 	            dataType: "json",
 	            success: function (data) {
-	                if (data.err = "0") {
+	                if (data.err == "0") {
 	                  if(window.location.pathname == "/admin/login")
 	                    location.href ="/admin";
 	                  else
@@ -55,7 +146,10 @@
 </head>
   <body id="page-top">
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-      <a class="navbar-brand mr-1" href="/">Administración </a>
+      <a class="navbar-brand mr-1" href="/">
+        <img src="{{ asset('img/jc.png') }}" alt="Logo" style="height: 50px; width: 50px; margin-right: 8px; border-radius: 50%;">
+        Administración
+      </a>
       <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
         <i class="fas fa-bars"></i>
       </button>
@@ -78,6 +172,7 @@
         </li>
          <li class="nav-item dropdown no-arrow">
           <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <img src="{{ asset('img/jc.png') }}" alt="Admin" style="height: 20px; width: 20px; margin-right: 5px; border-radius: 50%;">
             <i class="fas fa-user-circle fa-fw"></i> {{ Session::get("usuario_nombre") }}
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
@@ -124,6 +219,29 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">@yield('titulo')</h1>
+            <!-- Ejemplo de filtros Isotope -->
+        
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                var grid = document.querySelector('#grid');
+                var filtersElem = document.querySelector('#filters');
+                if (grid && typeof Isotope !== 'undefined') {
+                  var iso = new Isotope(grid, {
+                    itemSelector: '.col-md-4',
+                    layoutMode: 'fitRows'
+                  });
+                  if (filtersElem) {
+                    filtersElem.addEventListener('click', function(event) {
+                      if (!event.target.matches('button')) {
+                        return;
+                      }
+                      var filterValue = event.target.getAttribute('data-filter');
+                      iso.arrange({ filter: filterValue });
+                    });
+                  }
+                }
+              });
+            </script>
             </div>
         </div>
         <div class="row">
@@ -233,10 +351,6 @@
         if(this.id != 'lstGrupo')
         modificado = true;  
     }); 
-    window.onbeforeunload = function() {
-        if (modificado)  
-            return 'Puede haber cambios sin guardar en el formulario, ¿Desea salir de todas formas?'; 
-    }
     </script>
-  </body>
-</html>
+    <!-- Isotope JS -->
+    @yield('isotope')

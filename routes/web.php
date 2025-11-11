@@ -1,6 +1,8 @@
 <?php
+use Illuminate\Support\Facades\Route;
  //use Carbon\Carbon; 
 /*
+
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
@@ -10,6 +12,7 @@
 | contains the "web" middleware group. Now create something great!
 |
  */
+
 
 /*Route::get('/time' , function(){$date =new Carbon;echo $date ; } );*/
 
@@ -96,3 +99,8 @@ Route::get('/admin/patente/cargarGrilla', 'ControladorPatente@cargarGrilla')->na
 Route::get('/admin/patente/eliminar', 'ControladorPatente@eliminar');
 Route::get('/admin/patente/nuevo/{id}', 'ControladorPatente@editar');
 Route::post('/admin/patente/nuevo/{id}', 'ControladorPatente@guardar');
+
+/* --------------------------------------------- */
+/* CONTROLADOR Categorias laborales                         */
+/* --------------------------------------------- */
+Route::get('/admin/categorias-laborales', 'CategoriasLaboralesController@index');
