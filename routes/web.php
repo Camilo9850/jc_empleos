@@ -117,3 +117,9 @@ Route::post('/admin/cargo/{id}', 'CargosController@guardar');
 /* CONTROLADOR Categorias laborales                         */
 /* --------------------------------------------- */
 Route::get('/admin/categorias-laborales', 'CategoriasLaboralesController@index');
+Route::get('/admin/categoria-laboral/nuevo', 'CategoriasLaboralesController@nuevo');
+Route::post('/admin/categoria-laboral/nuevo', 'CategoriasLaboralesController@guardar');
+Route::get('/admin/categoria-laboral/cargarGrilla', 'CategoriasLaboralesController@cargarGrilla')->name('categoria.cargarGrilla');
+Route::get('/admin/categoria-laboral/eliminar', 'CategoriasLaboralesController@eliminar');
+Route::get('/admin/categoria-laboral/{id}', 'CategoriasLaboralesController@editar');
+Route::post('/admin/categoria-laboral/{id}', 'CategoriasLaboralesController@guardar');
