@@ -13,8 +13,11 @@ class CreateCategoriasLaboralesTable extends Migration
      */
     public function up()
     {
-        Schema::create('categorias-laborales', function (Blueprint $table) {
-            $table->id();
+        Schema::create('categorias_laborales', function (Blueprint $table) {
+            $table->increments('idcategoria_laboral');
+            $table->string('nombre', 100);
+            $table->text('descripcion')->nullable();
+            $table->enum('estado', ['ACTIVO', 'INACTIVO'])->default('ACTIVO');
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ class CreateCategoriasLaboralesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categorias-laborales');
+        Schema::dropIfExists('categorias_laborales');
     }
 }

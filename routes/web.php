@@ -100,6 +100,19 @@ Route::get('/admin/patente/eliminar', 'ControladorPatente@eliminar');
 Route::get('/admin/patente/nuevo/{id}', 'ControladorPatente@editar');
 Route::post('/admin/patente/nuevo/{id}', 'ControladorPatente@guardar');
 
+
+/* --------------------------------------------- */
+/* CONTROLADOR Categorias Cargos                  */
+/* --------------------------------------------- */
+
+Route::get('/admin/cargos', 'CargosController@index');
+Route::get('/admin/cargo/nuevo', 'CargosController@nuevo');
+Route::post('/admin/cargo/nuevo', 'CargosController@guardar');
+Route::get('/admin/cargo/cargarGrilla', 'CargosController@cargarGrilla')->name('cargo.cargarGrilla');
+Route::get('/admin/cargo/eliminar', 'CargosController@eliminar');
+Route::get('/admin/cargo/{id}', 'CargosController@editar');
+Route::post('/admin/cargo/{id}', 'CargosController@guardar');
+
 /* --------------------------------------------- */
 /* CONTROLADOR Categorias laborales                         */
 /* --------------------------------------------- */
