@@ -15,15 +15,42 @@
 </ol>
 @endsection
 @section('contenido')
-<table id="grilla" class="display">
-    <thead>
-        <tr>
-            <th>Cargo</th>
-            <th>Categoría</th>
-            <th>Estado</th>
-        </tr>
-    </thead>
-</table>
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Gestión de Cargos</h5>
+    </div>
+    <div class="card-body">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        <table id="grilla" class="table table-bordered table-striped display">
+            <thead>
+                <tr>
+                    <th>Cargo</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                    <th style="width: 150px;">Acciones</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
 <script>
     var dataTable = $('#grilla').DataTable({
         "processing": true,
@@ -37,8 +64,47 @@
         "columns": [
             { "data": "cargo" },
             { "data": "categoria" },
-            { "data": "estado" }
+            { "data": "estado" },
+            {
+                "data": "id",
+                "orderable": false,
+                "searchable": false,
+                "render": function(data, type, row) {
+                    return `
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="/admin/cargo/${data}" class="btn btn-primary" title="Editar">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <button type="button" class="btn btn-danger" onclick="eliminarCargo(${data})" title="Eliminar">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    `;
+                }
+            }
         ]
     });
+
+    function eliminarCargo(id) {
+        if(confirm('¿Está seguro de que desea eliminar este cargo?')) {
+            $.ajax({
+                type: 'GET',
+                url: '/admin/cargo/eliminar',
+                data: { id: id },
+                success: function(response) {
+                    if(response.success) {
+                        alert(response.success);
+                        dataTable.ajax.reload();
+                    } else if(response.error) {
+                        alert('Error: ' + response.error);
+                    }
+                },
+                error: function(err) {
+                    const errMsg = err.responseJSON && err.responseJSON.error ? err.responseJSON.error : 'Error desconocido';
+                    alert('Error al eliminar: ' + errMsg);
+                }
+            });
+        }
+    }
 </script>
 @endsection
