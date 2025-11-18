@@ -90,35 +90,58 @@ class CargosController extends Controller
     public function cargarGrilla(Request $request)
     {
         $request = $_REQUEST;
+
+        // Column mapping for ordering
         $columns = array(
-            0 => 'Cargo',
-            1 => 'Cargo',
-            2 => 'estado'
+            0 => 'c.Cargo',
+            1 => 'cl.nombre',
+            2 => 'c.estado'
         );
-        
+
         $sql = "SELECT 
-                    id_Cargo_PK,
-                    Cargo,
-                    estado
-                FROM tbl_Cargo WHERE 1=1";
+                    c.id_cargo_pk as id,
+                    c.Cargo as cargo,
+                    COALESCE(cl.nombre, '') as categoria,
+                    c.estado as estado
+                FROM tbl_cargo c
+                LEFT JOIN categorias_laborales cl ON c.id_categoriaslaborales_FK = cl.idcategoria_laboral
+                WHERE 1=1";
 
         if (!empty($request['search']['value'])) {
-            $search = $request['search']['value'];
-            $sql .= " AND (Cargo LIKE '%$search%' OR estado LIKE '%$search%')";
+            $search = addslashes($request['search']['value']);
+            $sql .= " AND (c.Cargo LIKE '%$search%' OR cl.nombre LIKE '%$search%' OR c.estado LIKE '%$search%')";
         }
-        
-        $sql .= " ORDER BY " . $columns[$request['order'][0]['column']] . " " . $request['order'][0]['dir'];
-        
+
+        // Ordering
+        if (isset($request['order'][0]['column'])) {
+            $orderCol = intval($request['order'][0]['column']);
+            $orderDir = $request['order'][0]['dir'] === 'desc' ? 'DESC' : 'ASC';
+            $orderBy = isset($columns[$orderCol]) ? $columns[$orderCol] : 'c.Cargo';
+            $sql .= " ORDER BY " . $orderBy . " " . $orderDir;
+        }
+
         $resultado = DB::select($sql);
-        $total = count(DB::select("SELECT * FROM tbl_Cargo"));
-        
+
+        $totalQuery = DB::select("SELECT COUNT(*) as cnt FROM tbl_cargo");
+        $total = isset($totalQuery[0]) ? intval($totalQuery[0]->cnt) : count($resultado);
+
+        // Convert objects to associative arrays with lowercase keys matching JS mapping
+        $data = array_map(function($row){
+            return [
+                'id' => $row->id,
+                'cargo' => $row->cargo,
+                'categoria' => $row->categoria,
+                'estado' => $row->estado
+            ];
+        }, $resultado);
+
         $json_data = array(
-            "draw" => intval($request['draw']),
+            "draw" => isset($request['draw']) ? intval($request['draw']) : 0,
             "recordsTotal" => $total,
-            "recordsFiltered" => count($resultado),
-            "data" => $resultado,
+            "recordsFiltered" => count($data),
+            "data" => $data,
         );
-        
+
         return response()->json($json_data);
     }
 }

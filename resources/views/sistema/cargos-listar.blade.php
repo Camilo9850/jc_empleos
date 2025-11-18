@@ -33,7 +33,12 @@
         "bSearchable": true,
         "pageLength": 25,
         "order": [[0, "asc"]],
-        "ajax": "{{ route('cargo.cargarGrilla') }}"
+        "ajax": "{{ Route::has('cargo.cargarGrilla') ? route('cargo.cargarGrilla') : url('/admin/cargo/cargarGrilla') }}",
+        "columns": [
+            { "data": "cargo" },
+            { "data": "categoria" },
+            { "data": "estado" }
+        ]
     });
 </script>
 @endsection
